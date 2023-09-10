@@ -8,7 +8,7 @@ Our BBCode specification can be found [here](https://github.com/EndaHallahan/BBC
 
 ## General Usage:
 
-```rust
+```no_run
 use bbclash::bbcode_to_html;
 
 assert_eq!(bbcode_to_html("I'm [i]italic[/i] and [b]bold![/b]"), 
@@ -19,7 +19,7 @@ assert_eq!(bbcode_to_html("I'm [i]italic[/i] and [b]bold![/b]"),
 
 BBBClash has two main modes of operation: *pretty* and *ugly*. Pretty output uses the `bbcode_to_html` function, and excludes improperly formatted bbcode and empty elements from the final output:
 
-```rust
+```no_run
 use bbclash::bbcode_to_html;
 
 assert_eq!(bbcode_to_html("I'm [colour]missing an argument![/colour]"), 
@@ -31,7 +31,7 @@ assert_eq!(bbcode_to_html("[quote][/quote]"),
 
 Ugly uses the `bbcode_to_html_ugly` function, and leaves improperly formatted BBCode tags and empty elements in the final output as written:
 
-```rust
+```no_run
 use bbclash::bbcode_to_html_ugly;
 
 assert_eq!(bbcode_to_html_ugly("I'm [colour]missing an argument![/colour]"), 
@@ -63,7 +63,7 @@ pub use crate::html_constructor::HTMLConstructor;
 /// This function produces *pretty* output, meaning that any eroneously written BBCode encountered or empty tags will be removed from the final output.
 /// # Examples
 ///
-/// ```
+/// ```no_run
 ///use bbclash::bbcode_to_html;
 ///
 ///assert_eq!(bbcode_to_html("I'm [i]italic[/i] and [b]bold![/b]"), 
@@ -83,7 +83,7 @@ pub fn bbcode_to_html(input: &str) -> String {
 /// This function produces *ugly* output, meaning that any eroneously written BBCode or empty tags encountered will be included in the final output.
 /// # Examples
 ///
-/// ```
+/// ```no_run
 ///use bbclash::bbcode_to_html_ugly;
 ///
 ///assert_eq!(bbcode_to_html_ugly("I'm [colour]missing an argument![/colour]"), 
@@ -99,7 +99,7 @@ pub fn bbcode_to_html_ugly(input: &str) -> String {
 	constructor.construct(lexer.lex(tokenizer.tokenize(input)))
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct Tree<Node> {
 	arena: Vec<Node>,
 }

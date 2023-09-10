@@ -4,7 +4,7 @@ use super::Instruction;
 #[derive(Debug, PartialEq)]
 enum ReadMode {
 	Text,
-	Escape,
+	//Escape,
 	Tag,
 	TagPrimaryArg,
 	Parabreak,
@@ -32,7 +32,7 @@ impl BBCodeTokenizer {
 		for character in bbcode_chars {
 			match &self.mode {
 				ReadMode::Text => {self.parse_text(character);},
-				ReadMode::Escape => {self.parse_escape(character);},
+				//ReadMode::Escape => {self.parse_escape(character);},
 				ReadMode::Tag => {self.parse_tag(character);},
 				ReadMode::TagPrimaryArg => {self.parse_tag_primary_arg(character);},
 				ReadMode::Parabreak => {self.parse_parabreak(character);},
@@ -45,9 +45,9 @@ impl BBCodeTokenizer {
 	/// s characters.
 	fn parse_text(&mut self, character: char) {
 		match character {
-			'\\' => {
+			/*'\\' => {
 				self.mode = ReadMode::Escape
-			},
+			},*/
 			'[' => {
 				self.set_cur_instruction();
 				self.mode = ReadMode::Tag;
@@ -56,7 +56,7 @@ impl BBCodeTokenizer {
 				self.set_cur_instruction();
 				self.mode = ReadMode::Parabreak;
 			},
-			'>' | '<' | '&' | '"' | '\'' => {
+			'>' | '<' | '&' | '"' | '\'' | '\\' => {
 				let san_char = self.sanitize(character);
 				match self.current_instruction {
 					Instruction::Text(ref mut contents) => {
@@ -115,7 +115,7 @@ impl BBCodeTokenizer {
 		
 	}
 	/// s escaped charcters.
-	fn parse_escape(&mut self, character: char) {
+	/*fn parse_escape(&mut self, character: char) {
 		self.mode = ReadMode::Text;
 		match character {
 			'>' | '<' | '&' | '"' | '\'' | '\\' => {
@@ -140,7 +140,7 @@ impl BBCodeTokenizer {
 				}
 			}
 		}	
-	}
+	}*/
 	/// s BBCode tags.
 	fn parse_tag(&mut self, character: char) {
 		match character {
@@ -242,4 +242,74 @@ impl BBCodeTokenizer {
 			_ => unreachable!()
 		}.to_string()
 	}
+}
+
+/* -- Tests -- */
+#[test]
+fn tokenizer_empty_string() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize(""), &vec![]);
+}
+
+#[test]
+fn tokenizer_string() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("Argabarga"), &vec![Instruction::Text("Argabarga".to_string())]);
+}
+
+#[test]
+fn tokenizer_escape() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("<>&\"\'\\"), &vec![Instruction::Text("&lt&gt&amp&quot&#x27&#x2F".to_string())]);
+}
+
+#[test]
+fn tokenizer_linebreak() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("Argabarga\nArgabarga"), &vec![
+    	Instruction::Text("Argabarga".to_string()), 
+    	Instruction::Linebreak, 
+    	Instruction::Text("Argabarga".to_string())
+    ]);
+}
+
+#[test]
+fn tokenizer_paragraphs() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("Argabarga\n\nArgabarga"), &vec![
+    	Instruction::Text("Argabarga".to_string()), 
+    	Instruction::Parabreak("\n\n".to_string()), 
+    	Instruction::Text("Argabarga".to_string())
+    ]);
+}
+
+#[test]
+fn tokenizer_scenebreak() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("Argabarga\n\n\nArgabarga"), &vec![
+    	Instruction::Text("Argabarga".to_string()), 
+    	Instruction::Scenebreak, 
+    	Instruction::Text("Argabarga".to_string())
+    ]);
+}
+
+#[test]
+fn tokenizer_tag() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("This text is [b]bold[/b]"), &vec![
+    	Instruction::Text("This text is ".to_string()), 
+    	Instruction::Tag("b".to_string(), None), 
+    	Instruction::Text("bold".to_string()),
+    	Instruction::Tag("/b".to_string(), None)
+    ]);
+}
+
+#[test]
+fn tokenizer_tag_with_argument() {
+    let mut tokenizer = BBCodeTokenizer::new();
+    assert_eq!(tokenizer.tokenize("[quote=John Doe]This is a quote[/quote]"), &vec![
+    	Instruction::Tag("quote".to_string(), Some("John Doe".to_string())), 
+    	Instruction::Text("This is a quote".to_string()),
+    	Instruction::Tag("/quote".to_string(), None)
+    ]);
 }

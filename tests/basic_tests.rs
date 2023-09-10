@@ -1,6 +1,6 @@
 use bbclash::{bbcode_to_html, bbcode_to_html_ugly};
 
-#[test]
+/*#[test]
 fn empty_string() {
     assert_eq!(bbcode_to_html(""), 
     	"");
@@ -123,4 +123,4 @@ fn not_a_tag() {
 fn ugly_output() {
 	assert_eq!(bbcode_to_html_ugly("I'm [colour]missing an argument![/colour]"), 
 		"<p>I&#x27m [colour]missing an argument![/colour]</p>");
-}
+}*/

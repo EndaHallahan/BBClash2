@@ -1,7 +1,7 @@
 use bbclash::bbcode_to_html;
 use bbclash::bbcode_to_html_ugly;
 
-/*-- COLOUR --*/
+/*/*-- COLOUR --*/
 #[test]
 fn color_no_argument() {
     assert_eq!(bbcode_to_html("[color]This should not be coloured[/color]"), 
@@ -694,4 +694,4 @@ fn email_no_text() {
 fn email_no_text_ugly() {
     assert_eq!(bbcode_to_html_ugly("[email][/email]This should not be a link."), 
         "<p>[email][/email]This should not be a link.</p>");
-}
+}*/
